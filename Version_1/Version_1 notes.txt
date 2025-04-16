@@ -1,0 +1,8 @@
+---------------------------------------------------------------Version 1-----------------------------------------------------------------------------------------
+Product: Water Level Controller with mobile control
+Description: This product used as supporting device for existing water level AC sensing controller and adds extra features for user convenience.
+Features: Mobile app control (Only motor on), Status in Mobile app, Power cut detection with backup power, Sump water status in percentage(ultrasonic sensor)
+Items used: 3 controllers(2 NSK ESP,1 Node MCU), 2 channel 5V relay, mobile charger, 5V Fan, voltage divider circuit - 		    resistors, Ultrasonic sensor, power bank.
+Interface: Android App()- used MIT app inventor for development.
+--------------------------------------------------------------END------------------------------------------------------------------------------------------------
+

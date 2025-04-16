@@ -1,0 +1,28 @@
+Connecting to Jio-Yesh
+..................WiFi connected
+IP address: 
+192.168.31.197
+Contacting Time Server
+
+Now is : 2025-03-23 17:27:59
+Formatting LittleFS filesystem
+Mount LittleFS
+Listing directory: /
+Deleting file: /hello.txt
+Delete failed
+Writing file: /hello.txt
+File written
+Appending to file: /hello.txt
+Message appended
+Listing directory: /
+  FILE: hello.txt  SIZE: 13    CREATION: 2025-03-23 17:27:59
+  LAST WRITE: 2025-03-23 17:28:01
+The timestamp should be valid above
+Now unmount and remount and perform the same operation.
+Timestamp should be valid, data should be good.
+Now mount it
+Reading file: /hello.txt
+Read from file: Hello World!
+Listing directory: /
+  FILE: hello.txt  SIZE: 13    CREATION: 2025-03-23 17:27:59
+  LAST WRITE: 2025-03-23 17:28:01
