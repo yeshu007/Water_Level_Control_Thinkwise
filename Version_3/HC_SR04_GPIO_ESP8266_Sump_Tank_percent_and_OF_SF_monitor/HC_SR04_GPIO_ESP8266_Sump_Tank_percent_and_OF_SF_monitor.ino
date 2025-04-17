@@ -247,7 +247,7 @@ void Sampler_OT()
   currrent_sample_ot = OT_Water_Distance();
   //currrent_sample = HC_SR04_Yesh.ping_cm();
 
-  currrent_sample_ot = currrent_sample_ot - 16; //dist in cm from USS to OF sensor
+  currrent_sample_ot = currrent_sample_ot - 19; //dist in cm from USS to OF sensor
 
   if (currrent_sample_ot >= 0)
   {
