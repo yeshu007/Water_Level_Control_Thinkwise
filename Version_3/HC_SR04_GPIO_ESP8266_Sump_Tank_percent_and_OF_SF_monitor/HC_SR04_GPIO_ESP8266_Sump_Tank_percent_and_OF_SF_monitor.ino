@@ -1,3 +1,4 @@
+#include <time.h>
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <FirebaseESP8266.h>
@@ -34,6 +35,9 @@
 // Floats to calculate distance
 float duration_ot, distance_ot, duration_sump, distance_sump;
 float prev_sample_ot, currrent_sample_ot, prev_sample_sump, currrent_sample_sump;
+
+long timezone = 0;
+byte daysavetime = 1;
 
 //Define Firebase Data object
 FirebaseData firebaseData;
@@ -174,6 +178,16 @@ void setup(){
   pinMode(TRIGPIN_OT, OUTPUT);
 
   init_wifi();
+
+  // After connecting to WiFi
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+
+  // Set your timezone
+  setenv("TZ", "IST-5:30", 1);  // Change to your timezone
+  tzset();
+
+  //configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+
   /* Assign the api key (required) */
   config.api_key = API_KEY;
 
@@ -315,7 +329,7 @@ void Sampler_OT()
       if(OF_read == "1")
       {
         Serial.println("OF: 1");
-        water_percentage = 100.0;
+        //water_percentage = 100.0;
       }
       else
       {
@@ -367,7 +381,7 @@ void Sampler_SUMP()
   //currrent_sample = HC_SR04_Yesh.ping_cm();
   // if(currrent_sample_sump > 18) 
   // {
-    currrent_sample_sump = currrent_sample_sump - 18; //dist in cm from USS to SF sensor
+    currrent_sample_sump = currrent_sample_sump - 15; //dist in cm from USS to SF sensor
   // }
   // else
   // {
@@ -379,7 +393,8 @@ void Sampler_SUMP()
   }
   else
   {
-    currrent_sample_sump = (currrent_sample_sump * -1);
+    //currrent_sample_sump = (currrent_sample_sump * -1);
+    currrent_sample_sump = 0;
   }
   Serial.print("currrent_sample_sump: ");
   Serial.println(currrent_sample_sump);
@@ -436,7 +451,7 @@ void Sampler_SUMP()
       if((SF_read == "1"))
       {
         Serial.println("SF: 1");
-        water_percentage = 100.0;
+        //water_percentage = 100.0;
       }
       else
       {
@@ -485,13 +500,65 @@ void Sampler_SUMP()
   //Serial.println(prev_sample);
   //end
 }
+void Live_Time()
+{
+  String S_error="";
+  String S_test="";
+  struct tm tmstruct;
+  delay(2000);
+  tmstruct.tm_year = 0;
+  getLocalTime(&tmstruct, 5000);
+  //Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
+  if(tmstruct.tm_hour > 12)
+  {
+    tmstruct.tm_hour = tmstruct.tm_hour - 12;
+  }
 
+  Serial.printf("\nNow is : %02d:%02d:%02d\n", tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
+  if (Firebase.ready() && signupOK ) 
+    {
+      if (Firebase.setFloat(firebaseData, "IOT_Control_4Load_mod/TH",tmstruct.tm_hour))
+      {
+        Serial.print("tmstruct.tm_hour: ");
+        Serial.println(tmstruct.tm_hour);
+      }
+      else 
+      {
+        Serial.println(S_error = firebaseData.errorReason());
+        firebase_Error_check(S_error);
+      }
+      if (Firebase.setFloat(firebaseData, "IOT_Control_4Load_mod/TM",tmstruct.tm_min))
+      {
+        Serial.print("tmstruct.tm_min: ");
+        Serial.println(tmstruct.tm_min);
+      }
+      else 
+      {
+        Serial.println(S_error = firebaseData.errorReason());
+        firebase_Error_check(S_error);
+      }
+      if (Firebase.setFloat(firebaseData, "IOT_Control_4Load_mod/TS",tmstruct.tm_sec))
+      {
+        Serial.print("tmstruct.tm_sec: ");
+        Serial.println(tmstruct.tm_sec);
+      }
+      else 
+      {
+        Serial.println(S_error = firebaseData.errorReason());
+        firebase_Error_check(S_error);
+      }
+    }
+    // Serial.printf("Get string value from firebase... %s\n", Firebase.getString(firebaseData, "IOT_Control_4Load_mod/OP") ? (S_test = firebaseData.to<const char *>()) : firebaseData.errorReason().c_str());
+    // Serial.print("S_test: ");
+    // Serial.println(S_test);
+}
 void loop()
 {
   unsigned long currentMillis = millis();
   Sampler_OT();
   Sampler_SUMP();
-  Alive_Counter();
+  //Alive_Counter();
+  Live_Time();
   // if WiFi is down, try reconnecting
   if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval))
   {
